@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -21,11 +22,13 @@ export class BoardController {
   }
 
   @UseGuards(XAppUserGuard)
-  @Put('/')
+  @Put('/:id')
   putBoard(
+    @Param('id') id: string,
     @Headers('X-App-User') user: string,
     @Body() { artifacts }: SendBoardDto,
   ) {
-    return this.board.sendBoard(user, artifacts);
+    if (id !== user) throw new BadRequestException();
+    return this.board.sendBoard(id, artifacts);
   }
 }

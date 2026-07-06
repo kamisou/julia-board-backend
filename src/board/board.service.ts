@@ -24,10 +24,11 @@ export class BoardService {
 
     const users = await this.users.getAll();
     const tokens = users.docs
+      .filter((user) => user.id !== id)
       .map((user) => user.data()?.fcmToken)
       .filter((e) => e !== undefined);
 
-    if (!tokens) return;
+    if (!tokens || tokens.length === 0) return;
 
     await this.messaging.sendEachForMulticast({
       tokens: tokens,

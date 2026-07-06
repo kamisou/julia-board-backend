@@ -20,9 +20,8 @@ export class XAppUserGuard implements CanActivate {
 
   canActivate(context: ExecutionContext) {
     const request: Request = context.switchToHttp().getRequest();
-    const user = request.headers['x-app-user'];
-    if (user === typeof 'string' && this.users.includes(user))
-      throw new UnauthorizedException();
+    const user = request.get('x-app-user');
+    if (!user || !this.users.includes(user)) throw new UnauthorizedException();
     return true;
   }
 }

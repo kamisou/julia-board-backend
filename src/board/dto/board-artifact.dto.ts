@@ -20,8 +20,8 @@ export class BoardArtifactDto {
 }
 
 export class BoardStrokeDto extends BoardArtifactDto {
-  @IsNumber()
-  color: number;
+  @IsString()
+  color: string;
   @IsNumber()
   width: number;
   @IsArray()
