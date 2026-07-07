@@ -1,5 +1,6 @@
 import { Global, Module } from '@nestjs/common';
-import { App, initializeApp } from 'firebase-admin/app';
+import { ConfigService } from '@nestjs/config';
+import { App, cert, initializeApp, ServiceAccount } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getMessaging } from 'firebase-admin/messaging';
 
@@ -7,8 +8,14 @@ import { getMessaging } from 'firebase-admin/messaging';
 @Module({
   providers: [
     {
+      inject: [ConfigService],
       provide: 'FIREBASE_APP',
-      useValue: initializeApp(),
+      useFactory: (config: ConfigService) =>
+        initializeApp({
+          credential: cert(
+            config.getOrThrow<ServiceAccount>('googleServiceAccount'),
+          ),
+        }),
     },
     {
       provide: 'FIRESTORE',

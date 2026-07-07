@@ -14,7 +14,7 @@ import KeyvRedis from '@keyv/redis';
     CacheModule.registerAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-        stores: [new KeyvRedis(config.getOrThrow<string>('CACHE_URL'))],
+        stores: [new KeyvRedis(config.getOrThrow<string>('cacheUrl'))],
       }),
     }),
   ],

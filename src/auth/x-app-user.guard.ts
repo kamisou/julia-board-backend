@@ -9,19 +9,17 @@ import { Request } from 'express';
 
 @Injectable()
 export class XAppUserGuard implements CanActivate {
-  private users: string[];
+  private users: { a: string; b: string };
 
   constructor(config: ConfigService) {
-    this.users = [
-      config.getOrThrow<string>('USER_A'),
-      config.getOrThrow<string>('USER_B'),
-    ];
+    this.users = config.getOrThrow<{ a: string; b: string }>('users');
   }
 
   canActivate(context: ExecutionContext) {
     const request: Request = context.switchToHttp().getRequest();
     const user = request.get('x-app-user');
-    if (!user || !this.users.includes(user)) throw new UnauthorizedException();
+    if (user !== this.users.a && user !== this.users.b)
+      throw new UnauthorizedException();
     return true;
   }
 }
