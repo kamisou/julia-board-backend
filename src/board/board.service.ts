@@ -36,6 +36,7 @@ export class BoardService {
         title: 'Nova mensagem!',
         body: 'Dê uma olhada... 👀',
       },
+      data: { id },
     });
   }
 }
