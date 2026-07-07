@@ -15,7 +15,7 @@ export default () => {
       a: process.env.USER_A,
       b: process.env.USER_B,
     },
-    cacheUrl: process.env.CACHE_URL,
+    redisUrl: process.env.CACHE_URL,
     googleServiceAccount,
   };
 };
