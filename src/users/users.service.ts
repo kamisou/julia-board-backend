@@ -15,6 +15,14 @@ const converter: FirestoreDataConverter<User | null> = {
 export class UsersService {
   constructor(@Inject('FIRESTORE') private firestore: Firestore) {}
 
+  get(id: string) {
+    return this.firestore
+      .collection('users')
+      .withConverter(converter)
+      .doc(id)
+      .get();
+  }
+
   getAll() {
     return this.firestore.collection('users').withConverter(converter).get();
   }

@@ -4,6 +4,7 @@ import { UsersService } from 'src/users/users.service';
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 import { instanceToPlain } from 'class-transformer';
 import { Messaging } from 'firebase-admin/messaging';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class BoardService {
@@ -11,6 +12,7 @@ export class BoardService {
     private users: UsersService,
     @Inject('MESSAGING') private messaging: Messaging,
     @Inject(CACHE_MANAGER) private cache: Cache,
+    private config: ConfigService,
   ) {}
 
   async getBoard(id: string) {
@@ -20,18 +22,16 @@ export class BoardService {
   }
 
   async sendBoard(id: string, artifacts: BoardArtifactDto[]) {
-    await this.cache.set(`board:${id}`, instanceToPlain(artifacts));
+    const users = this.config.getOrThrow<{ a: string; b: string }>('users');
+    const receiver = users.a == id ? users.b : users.a;
 
-    const users = await this.users.getAll();
-    const tokens = users.docs
-      .filter((user) => user.id !== id)
-      .map((user) => user.data()?.fcmToken)
-      .filter((e) => e !== undefined);
+    await this.cache.set(`board:${receiver}`, instanceToPlain(artifacts));
 
-    if (!tokens || tokens.length === 0) return;
+    const user = await this.users.get(receiver).then((doc) => doc.data());
+    if (!user?.fcmToken) return;
 
-    await this.messaging.sendEachForMulticast({
-      tokens: tokens,
+    await this.messaging.send({
+      token: user.fcmToken,
       notification: {
         title: 'Nova mensagem!',
         body: 'Dê uma olhada... 👀',
