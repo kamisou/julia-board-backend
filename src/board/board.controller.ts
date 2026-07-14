@@ -22,13 +22,11 @@ export class BoardController {
   }
 
   @UseGuards(XAppUserGuard)
-  @Put(':id')
+  @Put('/')
   putBoard(
-    @Param('id') id: string,
-    @Headers('X-App-User') user: string,
+    @Headers('X-App-User') sender: string,
     @Body() { artifacts }: SendBoardDto,
   ) {
-    if (id !== user) throw new ForbiddenException();
-    return this.board.sendBoard(id, artifacts);
+    return this.board.sendBoard(sender, artifacts);
   }
 }

@@ -21,22 +21,26 @@ export class BoardService {
     return artifacts;
   }
 
-  async sendBoard(id: string, artifacts: BoardArtifactDto[]) {
+  async sendBoard(sender: string, artifacts: BoardArtifactDto[]) {
     const users = this.config.getOrThrow<{ a: string; b: string }>('users');
-    const receiver = users.a == id ? users.b : users.a;
+    const receiver = users.a === sender ? users.b : users.a;
 
     await this.cache.set(`board:${receiver}`, instanceToPlain(artifacts));
 
     const user = await this.users.get(receiver).then((doc) => doc.data());
     if (!user?.fcmToken) return;
 
-    await this.messaging.send({
-      token: user.fcmToken,
-      notification: {
-        title: 'Nova mensagem!',
-        body: 'Dê uma olhada... 👀',
-      },
-      data: { id },
-    });
+    try {
+      await this.messaging.send({
+        token: user.fcmToken,
+        notification: {
+          title: 'Nova mensagem!',
+          body: 'Dê uma olhada... 👀',
+        },
+        data: { sender },
+      });
+    } catch {
+      await this.users.updateToken(receiver, null);
+    }
   }
 }

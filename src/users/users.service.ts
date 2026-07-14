@@ -23,11 +23,7 @@ export class UsersService {
       .get();
   }
 
-  getAll() {
-    return this.firestore.collection('users').withConverter(converter).get();
-  }
-
-  async updateToken(user: string, token: string) {
+  async updateToken(user: string, token: string | null) {
     await this.firestore.doc(`users/${user}`).set({ fcmToken: token });
   }
 }

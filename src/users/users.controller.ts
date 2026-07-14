@@ -9,7 +9,7 @@ export class UsersController {
 
   @UseGuards(XAppUserGuard)
   @Post('token')
-  getToken(
+  postToken(
     @Headers('X-App-User') user: string,
     @Body() { token }: UpdateTokenDto,
   ) {
