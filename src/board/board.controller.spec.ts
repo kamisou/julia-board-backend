@@ -3,6 +3,7 @@ import { BoardController } from './board.controller';
 import { BoardService } from './board.service';
 import { BoardStrokeDto } from './dto/board-artifact.dto';
 import { XAppUserGuard } from 'src/auth/x-app-user.guard';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 describe('BoardController', () => {
   const artifacts: BoardStrokeDto[] = [
@@ -24,6 +25,8 @@ describe('BoardController', () => {
       providers: [BoardService],
     })
       .overrideGuard(XAppUserGuard)
+      .useValue({})
+      .overrideGuard(ThrottlerGuard)
       .useValue({})
       .overrideProvider(BoardService)
       .useValue({
@@ -52,8 +55,10 @@ describe('BoardController', () => {
   });
 
   describe('putBoard', () => {
-    it('should correctly write to board when user writes to their board', () => {
-      expect(boardController.putBoard('1', { artifacts })).toBeUndefined();
+    it('should correctly write to board when user writes to their board', async () => {
+      await expect(
+        boardController.putBoard('1', { artifacts }),
+      ).resolves.toBeUndefined();
       expect(boardService.sendBoard).toHaveBeenCalledWith('1', artifacts);
     });
   });

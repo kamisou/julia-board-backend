@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  ForbiddenException,
   Get,
   Headers,
   Param,
@@ -11,11 +10,13 @@ import {
 import { SendBoardDto } from './dto/send-board.dto';
 import { BoardService } from './board.service';
 import { XAppUserGuard } from 'src/auth/x-app-user.guard';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 @Controller('board')
 export class BoardController {
   constructor(private board: BoardService) {}
 
+  @UseGuards(ThrottlerGuard)
   @Get(':id')
   getBoard(@Param('id') id: string) {
     return this.board.getBoard(id);
@@ -23,10 +24,10 @@ export class BoardController {
 
   @UseGuards(XAppUserGuard)
   @Put('/')
-  putBoard(
+  async putBoard(
     @Headers('X-App-User') sender: string,
     @Body() { artifacts }: SendBoardDto,
   ) {
-    return this.board.sendBoard(sender, artifacts);
+    await this.board.sendBoard(sender, artifacts);
   }
 }

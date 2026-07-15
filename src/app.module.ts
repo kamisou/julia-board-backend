@@ -4,7 +4,8 @@ import { BoardModule } from './board/board.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ConfigModule } from '@nestjs/config';
-import configuration from 'config/configuration';
+import { ThrottlerModule } from '@nestjs/throttler';
+import configuration from './config/configuration';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import configuration from 'config/configuration';
     AuthModule,
     UsersModule,
     ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
+    ThrottlerModule.forRoot({ throttlers: [{ ttl: 60000, limit: 10 }] }),
   ],
 })
 export class AppModule {}
